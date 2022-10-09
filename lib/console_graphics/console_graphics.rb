@@ -1,7 +1,5 @@
 require 'io/console'
 require_relative 'window.rb'
-# system 'mode 100, 25'
-# system 'cls'
 
 def line_window(w, h)
   line = "┏"
@@ -68,6 +66,7 @@ def control(win)
     when 'r'
       win.win_print
     when 'q'
+      system 'cls'
       break
     when 'up'
       win[x,y] = last

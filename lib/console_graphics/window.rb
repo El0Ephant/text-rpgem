@@ -9,6 +9,7 @@ class Window
         @body[i][j]='╳'
       end
     end
+    system 'cls'
   end
 
   def [] (i, j)
@@ -32,7 +33,7 @@ class Window
 
   def win_print
     return_size
-    system 'cls'
+    print "\e[1;1H"
     line = ''
     (@body.size-1).times do |x|
       @body[x].each do |y|
@@ -47,3 +48,13 @@ class Window
   end
 end
 
+# @perc = 0
+# t = Thread.new { loop do ; @perc += 1 ; sleep 0.050 ; end }
+# until @perc == 100
+#   puts "Downloading: (" + @perc.to_s + "%)"
+#   print "\r\e[A"
+#   #sleep 0.050
+# end
+# t.kill
+# puts "Downloading: (100%)"
+# print "\r\e[A"
