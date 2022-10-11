@@ -3,6 +3,6 @@
 require_relative "version"
 
 module TextRpgem
-    class Error < StandardError; end
+  class Error < StandardError; end
     # Your code goes here...
 end
