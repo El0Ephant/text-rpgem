@@ -13,12 +13,12 @@ module Parser
     text = File.read(path)
 
     description = text[/(?<={)(.|\s)*?(?=[^\\]})/]
-    Validation.validate_emptiness description, "Description", path
-    Validation.validate_extra_brackets description, "Description", path
+    Validation.validate_emptiness description, :Description, path
+    Validation.validate_extra_brackets description, :Description, path
     description&.strip!
 
     options_block = text[/[^\\]\[(.|\s)*[^\\]\]/]
-    Validation.validate_emptiness options_block, "OptionsBlock", path
+    Validation.validate_emptiness options_block, :OptionsBlock, path
     options = get_options_hash options_block, path
     [description, options]
   end
@@ -29,10 +29,10 @@ module Parser
   def get_options_hash(options_block, file_name)
     options = {}
 
-    options_block&.scan(/[^\\]\[((.|\s)*?)[^\\]\]/) do |option|
+    options_block&.scan(/[^\\]?\[((.|\s)*?[^\\])\]/) do |option|
       Validation.validate_option option[0], file_name
       option_alias, option_desc = option[0]&.split "::"
-      options[option_alias] = option_desc
+      options[option_alias.strip] = option_desc.strip
     end
     options
   end
@@ -50,7 +50,7 @@ module Parser
     end
 
     def validate_option(option, file_name)
-      raise ParsingError.new "Wrong option format", file_name unless option.include? "::" # TODO: Exception
+      raise ParsingError.new "Wrong option format", file_name if option.scan("::").count != 1
 
       option_alias, option_desc = option.split "::"
       validate_emptiness option_alias, :OptionAlias, file_name
