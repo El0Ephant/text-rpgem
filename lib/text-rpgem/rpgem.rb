@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "rpgem/version"
+require_relative "rpgem/n"
 
 module Text
   module Rpgem
