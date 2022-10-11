@@ -1,10 +1,8 @@
 # frozen_string_literal: true
 
-require_relative "rpgem/version"
+require_relative "version"
 
-module Text
-  module Rpgem
+module TextRpgem
     class Error < StandardError; end
     # Your code goes here...
-  end
 end

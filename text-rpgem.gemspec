@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require_relative "lib/text/rpgem/version"
+require_relative "lib/text-rpgem/version"
 
 Gem::Specification.new do |spec|
   spec.name = "text-rpgem"
-  spec.version = Text::Rpgem::VERSION
+  spec.version = TextRpgem::VERSION
   spec.authors = ["El0Ephant"]
   spec.email = ["75036763+El0Ephant@users.noreply.github.com"]
 

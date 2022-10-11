@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-module Text
-  module Rpgem
+module TextRpgem
     VERSION = "0.1.0"
-  end
 end
