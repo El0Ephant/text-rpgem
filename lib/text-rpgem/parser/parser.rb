@@ -18,7 +18,6 @@ module Parser
     description&.strip!
 
     options_block = text[/[^\\]\[(.|\s)*[^\\]\]/]
-    Validation.validate_emptiness options_block, :OptionsBlock, path
     options = get_options_hash options_block, path
     [description, options]
   end
@@ -28,11 +27,12 @@ module Parser
   # @return [Hash] hash of the form {'alias for option': 'option description'}
   def get_options_hash(options_block, file_name)
     options = {}
-
-    options_block&.scan(/[^\\]?\[((.|\s)*?[^\\])\]/) do |option|
-      Validation.validate_option option[0], file_name
-      option_alias, option_desc = option[0]&.split "::"
-      options[option_alias.strip] = option_desc.strip
+    unless options_block.nil? || !options_block&.match(/\A\s*\z/).nil?
+      options_block&.scan(/[^\\]?\[((.|\s)*?[^\\])\]/) do |option|
+        Validation.validate_option option[0], file_name
+        option_alias, option_desc = option[0]&.split "::"
+        options[option_alias.strip] = option_desc.strip
+      end
     end
     options
   end
