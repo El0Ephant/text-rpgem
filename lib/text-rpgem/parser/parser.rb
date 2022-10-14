@@ -9,8 +9,8 @@ module Parser
   # The main method for parsing an event from a file
   # @param path [String] path to file
   # @return [Array] [ string description, hash of the form {'alias for option': 'option description'} ]
-  def parse_event(path)
-    text = File.read(path, encoding: 'windows-1251')
+  def parse_event(path, encoding = "UTF-8")
+    text = File.read(path, encoding: encoding)
 
     description = text[/(?<={)(.|\s)*?(?=[^\\]})/]
     Validation.validate_emptiness description, :Description, path
