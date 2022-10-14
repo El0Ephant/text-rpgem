@@ -7,6 +7,7 @@ class Counter
   end
 
   attr_accessor :value
+
 end
 
 class Bar < Counter
@@ -15,5 +16,7 @@ class Bar < Counter
     @min = min
     super(value)
   end
+
   attr_reader :max, :min
+  
 end

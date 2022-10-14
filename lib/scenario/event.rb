@@ -7,9 +7,10 @@ class Event
     # Parser.parse_event(path)
     @description = "description_placeholder" # TODO: collaborate with parser
     @options = { right: "Пойти направо", left: "Пойти налево" } # TODO: collaborate with parser
-    @routes = { right: nil, left: nil }
     @route_lambda = ->(route_name) { return @routes[route_name] }
   end
+
+  attr_reader :description, :options
 
   # @param [Hash<Event>] routes
   def routes(routes)
