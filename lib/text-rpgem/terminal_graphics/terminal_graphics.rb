@@ -5,7 +5,7 @@ w = Window.new(100,25)
 w.run
 
 # in cmd:
-# ruby console_graphics.rb
+# ruby terminal_graphics.rb
 # Controls:
 # q - exit
 # e - start animation

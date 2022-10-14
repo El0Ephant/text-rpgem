@@ -22,7 +22,7 @@ class Window
 
   def run
     b = Bar.new("health",100,100)
-    t1 = File.read('C:\.Projects\text-rpgem\lib\text-rpgem\console_graphics\test.txt')
+    t1 = File.read('test.txt')
     create_text_buffer(t1)
     #move_text_line(0)
     thr = nil
