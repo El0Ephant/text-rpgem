@@ -1,0 +1,4 @@
+{text}
+[option1::go left]
+[]
+text
