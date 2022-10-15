@@ -13,27 +13,27 @@ class ParserTest < Test::Unit::TestCase
                  Parser.parse_event("#{File.dirname(__FILE__)}/oneword.txt"))
   end
   def test_empty_description
-    assert_raises Parser::ParserError do
+    assert_raises Parser::ParsingError do
       Parser.parse_event("#{File.dirname(__FILE__)}/null_desc.txt")
     end
   end
   def test_empty_file
-    assert_raises Parser::ParserError do
+    assert_raises Parser::ParsingError do
       Parser.parse_event("#{File.dirname(__FILE__)}/empty.txt")
     end
   end
   def test_extra_brackets
-    assert_raises Parser::ParserError do
+    assert_raises Parser::ParsingError do
       Parser.parse_event("#{File.dirname(__FILE__)}/extra_brackets.txt")
     end
   end
   def test_wrong_options
-    assert_raises Parser::ParserError do
+    assert_raises Parser::ParsingError do
       Parser.parse_event("#{File.dirname(__FILE__)}/wrong_options.txt")
     end
   end
   def test_empty_brackets
-    assert_raises Parser::ParserError do
+    assert_raises Parser::ParsingError do
       Parser.parse_event("#{File.dirname(__FILE__)}/empty_brackets.txt")
     end
   end
