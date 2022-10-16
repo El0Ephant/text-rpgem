@@ -1,0 +1,3 @@
+{text}
+[option1::go left]
+[option1::go right]

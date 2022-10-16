@@ -37,5 +37,29 @@ class ParserTest < Test::Unit::TestCase
       Parser.parse_event("#{File.dirname(__FILE__)}/empty_brackets.txt")
     end
   end
-
+  def test_no_brackets
+    assert_raises Parser::ParsingError do
+      Parser.parse_event("#{File.dirname(__FILE__)}/no_brackets.txt")
+    end
+  end
+  def test_duplicate_options
+    assert_raises Parser::ParsingError do
+      Parser.parse_event("#{File.dirname(__FILE__)}/duplicate_options.txt")
+    end
+  end
+  def test_duplicate_options_2
+    assert_raises Parser::ParsingError do
+      Parser.parse_event("#{File.dirname(__FILE__)}/duplicate_options_2.txt")
+    end
+  end
+  def test_missing_colon
+    assert_raises Parser::ParsingError do
+      Parser.parse_event("#{File.dirname(__FILE__)}/missing_colon.txt")
+    end
+  end
+  def test_text_between_options
+    assert_raises Parser::ParsingError do
+      Parser.parse_event("#{File.dirname(__FILE__)}/text_between_options.txt")
+    end
+  end
 end
