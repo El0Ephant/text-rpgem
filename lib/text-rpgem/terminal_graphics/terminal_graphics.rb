@@ -1,6 +1,10 @@
-require_relative 'window.rb'
 
-w = Window.new(100,25)
+
+require_relative "window"
+require "io/console"
+b = Bar.new("health", 100, 100)
+v = Value.new("stat", 100)
+w = Window.new(100, 25, [b,b,b,b,b], [v,v,v,v,v])
 # размеры окна - заглушка
 w.run
 
