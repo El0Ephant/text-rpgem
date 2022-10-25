@@ -1,6 +1,4 @@
-module Text
-  module Rpgem
+module TextRpgem
     VERSION: String
     # See the writing guide of rbs: https://github.com/ruby/rbs#guides
-  end
 end
