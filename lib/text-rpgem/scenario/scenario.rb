@@ -19,4 +19,9 @@ class Scenario
   def next(option)
     @current = @current.route_lambda.call(option)
   end
+
+  def not_print
+    puts @current.description
+    puts @current.options.each { |opt| puts opt[1] }
+  end
 end

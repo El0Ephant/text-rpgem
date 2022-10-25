@@ -1,13 +1,8 @@
 # TextRpgem
-#### Warning
-#### This is a student project. Viewer discretion is advised
-TextRpgem is a text quest creation tool.
-It helps you to connect your isolated text files in monolithic story tree.
 
-Main idea is pretty intuitive, but there is also some space for experiments with 
-custom routing between pages using custom counters (health, mana, etc).
+Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/text/rpgem`. To experiment with that code, run `bin/console` for an interactive prompt.
 
-If you don't want to work with GUI you can use built-in terminal interface.
+TODO: Delete this and the text above, and describe your gem
 
 ## Installation
 
@@ -21,13 +16,6 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Usage
 
-### Text markup
-TODO: Write usage instructions here
-
-### Your first quest
-TODO: Write usage instructions here
-
-### Advanced options
 TODO: Write usage instructions here
 
 ## Development
