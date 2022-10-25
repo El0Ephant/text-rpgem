@@ -1,15 +1,13 @@
 require "io/console"
 
 class Window
-  attr_reader :width, :height
-  def initialize(width, height, bars, values, ev_tr: nil)
-    @body = Array.new(height) { Array.new(width) }
+  def initialize(bars, values, ev_tr: nil)
+    @body = Array.new(25) { Array.new(100) }
     add_block(line_to_arr("┏#{"━" * 64}┳━┳#{"━" * 31}┓\n#{"┃#{" " * 64}┃ ┃#{" " * 31}┃\n" * 14}┃#{" " * 64}┃ ┣#{"━" * 15}┳#{"━" * 15}┫\n#{"┃#{" " * 64}┃ ┃#{" " * 15}┃#{" " * 15}┃\n" * 8}┗#{"━" * 64}┻━┻#{"━" * 15}┻#{"━" * 15}┛"), 0, 0)
-    @width = width
-    @height = height
     @event_tree = ev_tr
     @bars = bars
     @values = values
+    @is_panel_visible = false
     @cur_upper_line = 0
     # system 'cls' # Почистил терминал
     # print "\e[H\e[2J"
@@ -50,7 +48,6 @@ class Window
           thr.kill
           move_text_line(0)
         end
-        render
       when "q", "й"
         print "\e[H\e[2J"
         break
@@ -81,8 +78,19 @@ class Window
   end
 
   def return_size
-    system "mode #{@width}, #{@height}"
-    # print "\e[8;#{@height.to_s};#{@width.to_s}t"
+    system "mode 100, 25"
+    # print "\e[8;100;25t"
+  end
+
+  def show_choosing_panel
+    @is_panel_visible = true
+    add_block(line_to_arr("┏#{"━" * 62}┓\n#{"┃#{" " * 62}┃\n" * 12}┗#{"━" * 62}┛"), 1, 10)
+  end
+
+  def hide_choosing_panel
+    @is_panel_visible = false
+    add_block(Array.new(23, Array.new(64, " ")), 1, 1)
+    move_text_line(0)
   end
 
   def render
@@ -116,7 +124,7 @@ class Window
   end
 
   def text_print(sleep_time)
-    add_block(Array.new(23,Array.new(62, " ")), 2, 1)
+    add_block(Array.new(23, Array.new(64, " ")), 1, 1)
     x = 0
     line = 0
     loop do
@@ -142,9 +150,20 @@ class Window
   end
 
   def move_text_line(direction)
-    if @cur_upper_line + direction >= 0 && @cur_upper_line + direction <= @text.size - 23
-      @cur_upper_line += direction
-      add_block(@text[@cur_upper_line, 23], 2, 1)
+    if @cur_upper_line + direction <= @text.size - 23
+      if @cur_upper_line + direction >= 0
+        unless @is_panel_visible
+          @cur_upper_line += direction
+        else
+          hide_choosing_panel
+        end
+        add_block(@text[@cur_upper_line, 23], 2, 1)
+      end
+    else
+      unless @is_panel_visible
+        add_block(@text[@cur_upper_line + 14, 23], 2, 1)
+        show_choosing_panel
+      end
     end
   end
 
@@ -225,6 +244,7 @@ class Bar
     format("%10s", @name) + up + format("%10d", @value) + down
   end
 end
+
 class Value
   attr_reader :value
 
@@ -240,5 +260,6 @@ class Value
   def to_s
     format("%<name>15s\n%<value>15d", name:@name, value:@value)
   end
+
 end
 
