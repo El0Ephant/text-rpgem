@@ -1,24 +1,30 @@
 require "io/console"
-
+require_relative "escape_chars"
+require_relative "../scenario/scenario"
+require_relative "../scenario/counter"
 class Window
-  def initialize(bars, values, ev_tr: nil)
+  # @param [Scenario] scenario
+  def initialize(scenario)
     @body = Array.new(25) { Array.new(100) }
     add_block(line_to_arr("┏#{"━" * 64}┳━┳#{"━" * 31}┓\n#{"┃#{" " * 64}┃ ┃#{" " * 31}┃\n" * 14}┃#{" " * 64}┃ ┣#{"━" * 15}┳#{"━" * 15}┫\n#{"┃#{" " * 64}┃ ┃#{" " * 15}┃#{" " * 15}┃\n" * 8}┗#{"━" * 64}┻━┻#{"━" * 15}┻#{"━" * 15}┛"), 0, 0)
-    @event_tree = ev_tr
-    @bars = bars
-    @values = values
+    @current_event = scenario.current
+    @bars = []
+    @values = []
+    scenario.counters.each do |x|
+      if x.is_a? Bar
+        @bars.push x
+      else
+        @values.push x
+      end
+    end
     @is_panel_visible = false
     @cur_upper_line = 0
-    # system 'cls' # Почистил терминал
-    # print "\e[H\e[2J"
-    print "\e[?25l" # Скрыл курсор терминала
+    hide_cursor
+
   end
 
   def run
-    # b = Bar.new("health", 100, 100)
-    t1 = File.read("test.txt")
-    create_text_buffer(t1)
-
+    create_text_buffer(@current_event.description)
     thr = nil
     loop do
       # add_block(line_to_arr(b.to_s), 68, 1)
@@ -49,7 +55,7 @@ class Window
           move_text_line(0)
         end
       when "q", "й"
-        print "\e[H\e[2J"
+        exit_app
         break
       when "w", "ц"
         @bars[0].value += 1
@@ -85,6 +91,7 @@ class Window
   def show_choosing_panel
     @is_panel_visible = true
     add_block(line_to_arr("┏#{"━" * 62}┓\n#{"┃#{" " * 62}┃\n" * 12}┗#{"━" * 62}┛"), 1, 10)
+    @cursor_pos = 0
   end
 
   def hide_choosing_panel
@@ -95,7 +102,7 @@ class Window
 
   def render
     return_size
-    print "\e[1;1H" # Перешел в буфере терминала на координату 1;1
+    move_cursor_to 1, 1
     line = ""
     (@body.size - 1).times do |x|
       @body[x].each do |y|
@@ -152,10 +159,10 @@ class Window
   def move_text_line(direction)
     if @cur_upper_line + direction <= @text.size - 23
       if @cur_upper_line + direction >= 0
-        unless @is_panel_visible
-          @cur_upper_line += direction
-        else
+        if @is_panel_visible
           hide_choosing_panel
+        else
+          @cur_upper_line += direction
         end
         add_block(@text[@cur_upper_line, 23], 2, 1)
       end
@@ -199,29 +206,8 @@ class Window
   end
 end
 
-class Bar
-  attr_reader :value
-
-  def value=(val)
-    if val > @max_value
-      @value = @max_value
-      return
-    end
-    if val.negative?
-      @value = 0
-      return
-    end
-    @value = val
-  end
-
-  def initialize(name, max_value, value)
-    @name = name
-    @max_value = max_value
-    @value = value
-  end
-
-  def to_s
-    light = 20 - @value * 20 / @max_value
+def bar_to_s( bar)
+    light = 20 - @value * 20 / @max
     up =
       "┏━━━━━━━━━━━━━━━━━━━┓\n"
     down =
@@ -242,15 +228,9 @@ class Bar
       end
     end
     format("%10s", @name) + up + format("%10d", @value) + down
-  end
 end
-
 class Value
-  attr_reader :value
-
-  def value=(val)
-    @value = val
-  end
+  attr_accessor :value
 
   def initialize(name, value)
     @name = name
@@ -258,7 +238,7 @@ class Value
   end
 
   def to_s
-    format("%<name>15s\n%<value>15d", name:@name, value:@value)
+    format("%<name>15s\n%<value>15d", name: @name, value: @value)
   end
 
 end

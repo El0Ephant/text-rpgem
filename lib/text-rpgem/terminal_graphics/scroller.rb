@@ -23,15 +23,15 @@ class Scroller
       end
     end
     @last = 0
-    for i in 0..@line.length-1
+    (0..@line.length - 1).each { |i|
       @body[i] = @line[i]
       if @body[i] == 1
         @last = i
       end
-      end
+    }
     @pos = 0
   end
-  def move_down()
+  def move_down
     if @count > @sz
       @pos += 1
       @body[pos-1] = 0
@@ -39,7 +39,7 @@ class Scroller
 
     end
   end
-  def move_up()
+  def move_up
     if @count > @sz
       @pos -= 1
       @body[pos] = 1
@@ -58,7 +58,7 @@ s.move_down()
 s.move_up()
 
 arr = s.body
-for i in 0..count-1
+(0..count - 1).each { |i|
   if arr[i] == 1
     puts(str + "█\n")
   end
@@ -66,5 +66,5 @@ for i in 0..count-1
     puts(str + " \n")
   end
 
-end
+}
 
