@@ -1,3 +1,4 @@
+{
 About Ruby
 Wondering why Ruby is so popular? Its fans call it a beautiful, artful language. And yet, they say it’s handy and practical. What gives?
 The Ideals of Ruby’s Creator
@@ -13,3 +14,8 @@ Ruby is also completely free. Not only free of charge, but also free to use, cop
 Seeing Everything as an Object
 Initially, Matz looked at other languages to find an ideal syntax. Recalling his search, he said, “I wanted a scripting language that was more powerful than Perl, and more object-oriented than Python2.”
 In Ruby, everything is an object. Every bit of information and code can be given their own properties and actions. Object-oriented programming calls properties by the name instance variables and actions are known as methods. Ruby’s pure object-oriented approach is most commonly demonstrated by a bit of code which applies an action to a number.
+}
+
+[option1::go left]
+[option2::go straight]
+[option3::go right]

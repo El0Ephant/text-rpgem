@@ -2,21 +2,19 @@
 
 class Counter
   # @param [Integer] value
-  def initialize(name, value)
+  def initialize(value)
     @value = value
-    @name = name
   end
 
   attr_accessor :value
-  attr_reader :name
 
 end
 
 class Bar < Counter
-  def initialize(name, value, max, min: 0)
+  def initialize(value, max, min: 0)
     @max = max
     @min = min
-    super(name, value)
+    super(value)
   end
 
   attr_reader :max, :min

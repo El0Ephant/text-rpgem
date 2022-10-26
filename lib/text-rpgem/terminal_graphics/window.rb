@@ -7,44 +7,51 @@ class Window
   def initialize(scenario)
     @body = Array.new(25) { Array.new(100) }
     add_block(line_to_arr("┏#{"━" * 64}┳━┳#{"━" * 31}┓\n#{"┃#{" " * 64}┃ ┃#{" " * 31}┃\n" * 14}┃#{" " * 64}┃ ┣#{"━" * 15}┳#{"━" * 15}┫\n#{"┃#{" " * 64}┃ ┃#{" " * 15}┃#{" " * 15}┃\n" * 8}┗#{"━" * 64}┻━┻#{"━" * 15}┻#{"━" * 15}┛"), 0, 0)
-    @current_event = scenario.current
-    @bars = []
-    @values = []
-    scenario.counters.each do |x|
-      if x.is_a? Bar
-        @bars.push x
+    @scenario = scenario
+    @routes = []
+    @scenario.current.options.each_key do |k|
+      @routes.push k
+    end
+    @bars = {}
+    @counters = {}
+    scenario.counters.each_pair do |k, v|
+      if v.is_a? Bar
+        @bars[k] = v
       else
-        @values.push x
+        @counters[k] = v
       end
     end
     @is_panel_visible = false
     @cur_upper_line = 0
-    hide_cursor
-
+    EscapeChars.hide_cursor
   end
 
   def run
-    create_text_buffer(@current_event.description)
+    create_text_buffer(@scenario.current.description)
+    add_block(line_to_arr("Press E to start"), 2, 1)
     thr = nil
     loop do
-      # add_block(line_to_arr(b.to_s), 68, 1)
-      @bars.each_index do |i|
-        add_block(line_to_arr(@bars[i].to_s), 68, 3 * i + 1)
+      i = 0
+      @bars.each_pair do |k, v|
+        add_block(line_to_arr(bar_to_s(k, v)), 68, 3 * i + 1)
+        i += 1
       end
-      @values.each_index do |i|
-        add_block(line_to_arr(@values[i].to_s), i / 3 * 16 + 68, 3 * (i % 3) + 16)
+      i = 0
+      @counters.each_pair do |k, v|
+        add_block(line_to_arr(counter_to_s(k, v)), i / 3 * 16 + 68, 3 * (i % 3) + 16)
+        i += 1
       end
-      add_block(line_to_arr("█\n█\n█\n█\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n "), 66, 1)
+      # add_block(line_to_arr("█\n█\n█\n█\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n "), 66, 1)
       render
       case key_get
       when "up"
         thr.kill if !thr.nil? && thr.alive?
-        move_text_line(-1)
+        move_panel_cursor(-1)
       when "right"
         # do smth
       when "down"
         thr.kill if !thr.nil? && thr.alive?
-        move_text_line(1)
+        move_panel_cursor(1)
       when "left"
         # do smth
       when "e", "у"
@@ -55,14 +62,28 @@ class Window
           move_text_line(0)
         end
       when "q", "й"
-        exit_app
+        EscapeChars.exit_app
         break
       when "w", "ц"
-        @bars[0].value += 1
+        thr.kill if !thr.nil? && thr.alive?
+        move_text_line(-1)
       when "s", "ы"
-        @bars[0].value -= 1
+        thr.kill if !thr.nil? && thr.alive?
+        move_text_line(1)
+      when "enter"
+        @scenario.next @routes[@cursor_pos].to_sym
+        create_text_buffer(@scenario.current.description)
+        @cur_upper_line = 0
+        @is_panel_visible = false
+        @routes = []
+        @scenario.current.options.each_key do |k|
+          @routes.push k
+        end
+        move_text_line(0)
+        add_block(Array.new(23, Array.new(64, " ")), 1, 1)
+        thr = Thread.new { text_print(0.001) } if thr.nil? || !thr.alive?
       else
-        # type code here
+        next
       end
     end
   end
@@ -83,6 +104,17 @@ class Window
     end
   end
 
+  def add_highlighted_block(arr, x, y)
+    arr.size.times do |i|
+      arr[i].size.times do |j|
+        @body[y + i][x + j] = arr[i][j]
+      end
+      @body[y + i][x] = EscapeChars.highlighter + @body[y + i][x]
+      xx = x + arr[i].size - 1
+      @body[y + i][xx] = @body[y + i][xx] + EscapeChars.normalizer
+    end
+  end
+
   def return_size
     system "mode 100, 25"
     # print "\e[8;100;25t"
@@ -92,6 +124,21 @@ class Window
     @is_panel_visible = true
     add_block(line_to_arr("┏#{"━" * 62}┓\n#{"┃#{" " * 62}┃\n" * 12}┗#{"━" * 62}┛"), 1, 10)
     @cursor_pos = 0
+    @routes.each_index do |i|
+      if i == @cursor_pos
+        add_highlighted_block(line_to_arr(@scenario.current.options[@routes[i]]), 3, 11 + i * 2)
+      else
+        add_block(line_to_arr(@scenario.current.options[@routes[i]]), 3, 11 + i * 2)
+      end
+    end
+  end
+
+  def move_panel_cursor(direction)
+    return unless @cursor_pos + direction < @routes.size && @cursor_pos + direction >= 0
+
+    add_block(line_to_arr(@scenario.current.options[@routes[@cursor_pos]]), 3, 11 + @cursor_pos * 2)
+    @cursor_pos += direction
+    add_highlighted_block(line_to_arr(@scenario.current.options[@routes[@cursor_pos]]), 3, 11 + @cursor_pos * 2)
   end
 
   def hide_choosing_panel
@@ -102,7 +149,7 @@ class Window
 
   def render
     return_size
-    move_cursor_to 1, 1
+    EscapeChars.move_cursor_to(x: 1, y: 1)
     line = ""
     (@body.size - 1).times do |x|
       @body[x].each do |y|
@@ -154,6 +201,8 @@ class Window
       x += 1
       break if x == @text.size
     end
+    move_text_line(1)
+    render
   end
 
   def move_text_line(direction)
@@ -166,11 +215,10 @@ class Window
         end
         add_block(@text[@cur_upper_line, 23], 2, 1)
       end
-    else
-      unless @is_panel_visible
-        add_block(@text[@cur_upper_line + 14, 23], 2, 1)
-        show_choosing_panel
-      end
+    elsif !@is_panel_visible && !@scenario.current.options.empty?
+      add_block(@text[0, 23], 2, 1)
+      show_choosing_panel
+      # add_block(@text[@cur_upper_line + 14, 23], 2, 1)
     end
   end
 
@@ -206,8 +254,8 @@ class Window
   end
 end
 
-def bar_to_s( bar)
-    light = 20 - @value * 20 / @max
+def bar_to_s(name, bar)
+  light = 20 - bar.value * 20 / bar.max
     up =
       "┏━━━━━━━━━━━━━━━━━━━┓\n"
     down =
@@ -227,19 +275,10 @@ def bar_to_s( bar)
         down[light] = "┺"
       end
     end
-    format("%10s", @name) + up + format("%10d", @value) + down
+    format("%10s", name) + up + format("%10d", bar.value) + down
 end
-class Value
-  attr_accessor :value
 
-  def initialize(name, value)
-    @name = name
-    @value = value
-  end
-
-  def to_s
-    format("%<name>15s\n%<value>15d", name: @name, value: @value)
-  end
-
+def counter_to_s(name, counter)
+  format("%<name>15s\n%<value>15d", name: name, value: counter.value)
 end
 

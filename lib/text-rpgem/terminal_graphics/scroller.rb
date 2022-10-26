@@ -65,6 +65,5 @@ arr = s.body
   if arr[i] == 0
     puts(str + " \n")
   end
-
 }
 

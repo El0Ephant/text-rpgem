@@ -7,7 +7,7 @@ module EscapeChars
   end
 
   def exit_app
-    print "\e[H\e[2j"
+    print "\e[H\e[2J"
   end
 
   def move_cursor_to(x: 1, y: 1)
@@ -20,5 +20,13 @@ module EscapeChars
 
   def normalize_text
     print "\e[27m"
+  end
+
+  def highlighter
+    "\e[7m"
+  end
+
+  def normalizer
+    "\e[27m"
   end
 end
