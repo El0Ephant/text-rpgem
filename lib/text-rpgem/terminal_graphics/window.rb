@@ -24,14 +24,15 @@ class Window
         @counters[k] = v
       end
     end
-    validate_counters_number
     initialize_event
+    validate_elements_number
     @print_thread = nil
   end
 
-  def validate_counters_number
+  def validate_elements_number
     raise RuntimeError.new("Too much bars for terminal interface") if @bars.count > 5
     raise RuntimeError.new("Too much counters for terminal interface") if @counters.count > 6
+    raise RuntimeError.new("Too much options for terminal interface") if @routes.count > 6
   end
 
   def initialize_event
@@ -313,10 +314,12 @@ def bar_to_s(name, bar)
       down[light] = "┺"
     end
   end
+  name = "#{name[..6]}..." if name.length > 10
   format("%10s", name) + up + format("%10d", bar.value) + down
 end
 
 def counter_to_s(name, counter)
+  name = "#{name[..11]}..." if name.length > 15
   format("%<name>15s\n%<value>15d", name: name, value: counter.value)
 end
 
