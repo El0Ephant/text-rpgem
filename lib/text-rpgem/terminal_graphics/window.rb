@@ -1,7 +1,11 @@
+# frozen_string_literal: false
+
 require "io/console"
 require_relative "escape_chars"
 require_relative "../scenario/scenario"
 require_relative "../scenario/counter"
+
+# Class that represents Windows terminal interface for text rpg
 class Window
   # @param [Scenario] scenario
   def initialize(scenario)
@@ -46,31 +50,24 @@ class Window
       case key_get
       when "up"
         thr.kill if !thr.nil? && thr.alive?
-        move_panel_cursor(-1)
-      when "right"
-        # do smth
+        move_line(-1)
       when "down"
         thr.kill if !thr.nil? && thr.alive?
-        move_panel_cursor(1)
-      when "left"
-        # do smth
+        move_line(1)
       when "e", "у"
         thr = Thread.new { text_print(0.001) } if thr.nil? || !thr.alive?
-      when "r", "к"
-        if !thr.nil? && thr.alive?
-          thr.kill
-          move_text_line(0)
-        end
       when "q", "й"
         EscapeChars.exit_app
         break
       when "w", "ц"
         thr.kill if !thr.nil? && thr.alive?
-        move_text_line(-1)
+        move_line(-1)
       when "s", "ы"
         thr.kill if !thr.nil? && thr.alive?
-        move_text_line(1)
+        move_line(1)
       when "enter"
+        next if !@is_panel_visible || @scenario.current.options.empty?
+
         @scenario.next @routes[@cursor_pos].to_sym
         create_text_buffer(@scenario.current.description)
         @cur_upper_line = 0
@@ -117,7 +114,45 @@ class Window
 
   def return_size
     system "mode 100, 25"
-    # print "\e[8;100;25t"
+  end
+
+  def move_line(direction)
+    if @is_panel_visible
+      move_panel_cursor(direction)
+    else
+      move_text_line(direction)
+    end
+  end
+
+  def move_text_line(direction)
+    if @cur_upper_line + direction <= @text.size - 23
+      if @cur_upper_line + direction >= 0
+        if @is_panel_visible
+          hide_choosing_panel
+        else
+          @cur_upper_line += direction
+        end
+        add_block(@text[@cur_upper_line, 23], 2, 1)
+      end
+    elsif !@is_panel_visible && !@scenario.current.options.empty?
+      r = [9, @text.size].min
+      add_block(@text[-r, r], 2, 1)
+      show_choosing_panel
+    end
+  end
+
+  def move_panel_cursor(direction)
+    return if @cursor_pos + direction >= @routes.size
+
+    if (@cursor_pos + direction).negative?
+      @cursor_pos = 0
+      move_text_line(-1)
+      return
+    end
+
+    add_block(line_to_arr(@scenario.current.options[@routes[@cursor_pos]]), 3, 11 + @cursor_pos * 2)
+    @cursor_pos += direction
+    add_highlighted_block(line_to_arr(@scenario.current.options[@routes[@cursor_pos]]), 3, 11 + @cursor_pos * 2)
   end
 
   def show_choosing_panel
@@ -131,14 +166,6 @@ class Window
         add_block(line_to_arr(@scenario.current.options[@routes[i]]), 3, 11 + i * 2)
       end
     end
-  end
-
-  def move_panel_cursor(direction)
-    return unless @cursor_pos + direction < @routes.size && @cursor_pos + direction >= 0
-
-    add_block(line_to_arr(@scenario.current.options[@routes[@cursor_pos]]), 3, 11 + @cursor_pos * 2)
-    @cursor_pos += direction
-    add_highlighted_block(line_to_arr(@scenario.current.options[@routes[@cursor_pos]]), 3, 11 + @cursor_pos * 2)
   end
 
   def hide_choosing_panel
@@ -205,23 +232,6 @@ class Window
     render
   end
 
-  def move_text_line(direction)
-    if @cur_upper_line + direction <= @text.size - 23
-      if @cur_upper_line + direction >= 0
-        if @is_panel_visible
-          hide_choosing_panel
-        else
-          @cur_upper_line += direction
-        end
-        add_block(@text[@cur_upper_line, 23], 2, 1)
-      end
-    elsif !@is_panel_visible && !@scenario.current.options.empty?
-      add_block(@text[0, 23], 2, 1)
-      show_choosing_panel
-      # add_block(@text[@cur_upper_line + 14, 23], 2, 1)
-    end
-  end
-
   def key_get
     char = $stdin.getch.inspect[1..-2]
     case char
@@ -256,26 +266,26 @@ end
 
 def bar_to_s(name, bar)
   light = 20 - bar.value * 20 / bar.max
-    up =
-      "┏━━━━━━━━━━━━━━━━━━━┓\n"
-    down =
-      "┗━━━━━━━━━━━━━━━━━━━┛"
-    if light.positive?
-      up[0] = "┌"
-      down[0] = "└"
-      (light - 1).times do |i|
-        up[i + 1] = "─"
-        down[i + 1] = "─"
-      end
-      if light == 20
-        up[light] = "┐"
-        down[light] = "┘"
-      else
-        up[light] = "┲"
-        down[light] = "┺"
-      end
+  up =
+    "┏━━━━━━━━━━━━━━━━━━━┓\n"
+  down =
+    "┗━━━━━━━━━━━━━━━━━━━┛"
+  if light.positive?
+    up[0] = "┌"
+    down[0] = "└"
+    (light - 1).times do |i|
+      up[i + 1] = "─"
+      down[i + 1] = "─"
     end
-    format("%10s", name) + up + format("%10d", bar.value) + down
+    if light == 20
+      up[light] = "┐"
+      down[light] = "┘"
+    else
+      up[light] = "┲"
+      down[light] = "┺"
+    end
+  end
+  format("%10s", name) + up + format("%10d", bar.value) + down
 end
 
 def counter_to_s(name, counter)

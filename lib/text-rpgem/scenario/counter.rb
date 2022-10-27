@@ -19,17 +19,4 @@ class Bar < Counter
 
   attr_reader :max, :min
 
-  def value=(val)
-    if val > @max
-      @value = @max
-      return
-    end
-    if val < @min
-      @value = @min
-      return
-    end
-    @value = val
-  end
-
-
 end
