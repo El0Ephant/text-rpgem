@@ -48,7 +48,6 @@ class Window
   end
 
   def run
-    create_text_buffer(@scenario.current.description)
     add_block(line_to_arr("Press E to start"), 2, 1)
 
     loop do
@@ -314,12 +313,12 @@ def bar_to_s(name, bar)
       down[light] = "┺"
     end
   end
-  name = "#{name[..6]}..." if name.length > 10
+  name = "#{name[0, 7]}..." if name.length > 10
   format("%10s", name) + up + format("%10d", bar.value) + down
 end
 
 def counter_to_s(name, counter)
-  name = "#{name[..11]}..." if name.length > 15
+  name = "#{name[0, 12]}..." if name.length > 15
   format("%<name>15s\n%<value>15d", name: name, value: counter.value)
 end
 
