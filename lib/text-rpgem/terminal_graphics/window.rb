@@ -6,7 +6,7 @@ require_relative "../scenario/scenario"
 require_relative "../scenario/counter"
 require_relative "scroller"
 
-# Class that represents Windows terminal interface for text rpg
+# A class that represents the Windows terminal interface for text-based role-playing games
 class Window
   # @param [Scenario] scenario
   def initialize(scenario, print_speed: 0.001)
@@ -14,7 +14,13 @@ class Window
     EscapeChars.hide_cursor
     @print_speed = print_speed
     @body = Array.new(25) { Array.new(100) }
-    add_block(line_to_arr("┏#{"━" * 64}┳━┳#{"━" * 31}┓\n#{"┃#{" " * 64}┃ ┃#{" " * 31}┃\n" * 14}┃#{" " * 64}┃ ┣#{"━" * 15}┳#{"━" * 15}┫\n#{"┃#{" " * 64}┃ ┃#{" " * 15}┃#{" " * 15}┃\n" * 8}┗#{"━" * 64}┻━┻#{"━" * 15}┻#{"━" * 15}┛"), 0, 0)
+    add_block(line_to_arr(
+                "┏#{"━" * 64}┳━┳#{"━" * 31}┓\n"\
+                "#{"┃#{" " * 64}┃ ┃#{" " * 31}┃\n" * 14}"\
+                "┃#{" " * 64}┃ ┣#{"━" * 15}┳#{"━" * 15}┫\n"\
+                "#{"┃#{" " * 64}┃ ┃#{" " * 15}┃#{" " * 15}┃\n" * 8}"\
+                "┗#{"━" * 64}┻━┻#{"━" * 15}┻#{"━" * 15}┛"
+              ), 0, 0)
     @scenario = scenario
     @bars = {}
     @counters = {}
@@ -47,21 +53,28 @@ class Window
     end
     move_text_line(0)
     add_block(Array.new(23, Array.new(64, " ")), 1, 1)
-    move_line(0)
   end
 
   def run
-    add_block(line_to_arr("Press E to start"), 2, 1)
+    show_help_panel
     loop do
+      if @is_help_visible
+        case key_get
+        when "tab"
+          hide_help_panel
+        when "q", "й"
+          EscapeChars.exit_app
+          break
+        else
+          next
+        end
+      end
       update_bars
       update_counters
-      add_block(@scroller.result_arr, 66, 1)
-      # add_block(line_to_arr("█\n█\n█\n█\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n "), 66, 1)
-      #
       render
       case key_get
       when "tab"
-        return_size
+        show_help_panel
       when "up", "w", "ц"
         if print_thread_active?
           @print_thread&.kill
@@ -76,12 +89,10 @@ class Window
           next
         end
         move_line(1)
-      when "e", "у"
-        invoke_text_printing
       when "q", "й"
         EscapeChars.exit_app
         break
-      when "enter"
+      when "enter", "f", "а"
         next if !@is_panel_visible || @scenario.current.options.empty?
 
         @scenario.next @routes[@cursor_pos].to_sym
@@ -118,7 +129,28 @@ class Window
   end
 
   def show_help_panel
+    @is_help_visible = true
+    add_block(line_to_arr("┏#{"━" * 98}┓\n#{"┃#{" " * 98}┃\n" * 23}┗#{"━" * 98}┛\n"), 0, 0)
+    add_block(line_to_arr(
+                "Tab -> show/hide help (also return terminal size)\n"\
+                "W, S, ↑, ↓ -> move text\n"\
+                "F, Enter -> choose option\n"\
+                "Q -> exit application"
+              ), 1, 1)
+    render
+  end
 
+  def hide_help_panel
+    @is_help_visible = false
+    add_block(line_to_arr(
+                "┏#{"━" * 64}┳━┳#{"━" * 31}┓\n"\
+                "#{"┃#{" " * 64}┃ ┃#{" " * 31}┃\n" * 14}"\
+                "┃#{" " * 64}┃ ┣#{"━" * 15}┳#{"━" * 15}┫\n"\
+                "#{"┃#{" " * 64}┃ ┃#{" " * 15}┃#{" " * 15}┃\n" * 8}"\
+                "┗#{"━" * 64}┻━┻#{"━" * 15}┻#{"━" * 15}┛"
+              ), 0, 0)
+    move_text_line(0)
+    invoke_text_printing
   end
 
   def [](i, j)
@@ -171,8 +203,8 @@ class Window
   def move_text_line(direction)
     return if (@cur_upper_line + direction).negative?
 
-    #system "pause"
     @scroller.move direction
+    add_block(@scroller.result_arr, 66, 1)
     @cur_upper_line += direction
     add_block(@text[@cur_upper_line, 23], 2, 1)
   end
@@ -251,8 +283,10 @@ class Window
       end
       if x > 10 && x < @text.size - 12
         @cur_upper_line += 1
+        @scroller.move(1)
+        add_block(@scroller.result_arr, 66, 1)
         r = @text[@cur_upper_line, line]
-        r.push Array.new(62, " ")
+        r&.push Array.new(62, " ")
         add_block(r, 2, 1)
         render
       else
@@ -290,7 +324,7 @@ class Window
     line.each_line(chomp: true) do |x|
       res.push([])
       x.each_char do |c|
-        res.last.push(c)
+        res.last&.push(c)
       end
     end
     res

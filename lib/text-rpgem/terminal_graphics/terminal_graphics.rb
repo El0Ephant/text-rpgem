@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative "window"
 require_relative "../parser/parser"
 require_relative "../scenario/scenario"
@@ -33,11 +35,3 @@ w.run
 
 # in cmd:
 # ruby terminal_graphics.rb
-# Controls:
-# q - exit
-# e - start animation
-# r - stop animation
-# arrow up - move text up
-# arrow down - move text down
-# w - inc health
-# s - dec health
