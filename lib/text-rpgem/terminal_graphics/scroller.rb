@@ -44,7 +44,7 @@ class Scroller
     if @count > @sz
       @pos -= 1
       @body[pos] = 1
-      @body[pos+last+1] = 0
+      @body[pos + last + 1] = 0
     end
   end
 
