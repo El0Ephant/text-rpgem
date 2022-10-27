@@ -7,7 +7,7 @@ It helps you to connect your isolated text files in monolithic story tree.
 Main idea is pretty intuitive, but there is also some space for experiments with
 custom routing between pages using custom counters (health, mana, etc).
 
-If you don't want to work with GUI you can use built-in terminal interface.
+If you don't want to create your own GUI you can use built-in terminal interface.
 
 ## Installation
 
@@ -22,13 +22,137 @@ If bundler is not being used to manage dependencies, install the gem by executin
 ## Usage
 
 ### Text markup
-TODO: Write usage instructions here
+You story consists of events. Markup your text file
+like this
+
+{
+
+Description of event
+
+}
+
+[option_name1::option description]
+
+[option_name2::option description]
+
+[option_name3::option description]
+
+In your application you will refer to your option 
+by option name, player will only see option descriptions
+
+We strongly recommend you to structure your files meaningfully,
+but at the and of a day that is only your decision
 
 ### Your first quest
-TODO: Write usage instructions here
+You have done all markup things. Now you are ready to
+create your scenario
+
+1) Call constructor and provide hash with all your
+events and their aliases. That is done to parse all 
+files and catch parsing exceptions before first run.
+
+``` ruby
+test_scenario = Scenario.new(
+  events: {
+    beginning: Event("story_beginning.txt"),
+    river: Event("river.txt"),
+    forest: Event("forest.txt"),
+    tree: Event("tree.txt"),
+    cave: Event("cave.txt"),
+    monster: Event("battle.txt"),
+  }
+) 
+```
+
+2) Provide necessary bloc to create routes between
+your events using routes method
+``` ruby
+my_scenario = Scenario.new(_) do |events|
+  events[:beginning].routes(
+    {
+      left: events[:river],
+      right: events[:forest],
+    }
+  )
+end
+```
+
+3) Add more routes to create tree structure of
+your story.
+``` ruby
+my_scenario = Scenario.new(_) do |events|
+  events[:beginning].routes(
+    {
+      left: events[:river].routes(
+        get_back: events[:beginning],
+      ),
+      right: events[:forest].routes(
+        cave: events[:cave].routes(
+          {
+            deeper: events[:monster],
+          }
+        ),
+        further_in_forest: events[:tree],
+      ),
+    }
+  )
+end
+```
+You can rearrange your tree if you feel bad about
+depth
+``` ruby
+my_scenario = Scenario.new(_) do |events|
+  events[:beginning].routes(
+    {
+      left: events[:river].routes(
+        get_back: events[:beginning],
+      ),
+      right: events[:forest],
+    }
+  )
+
+  events[:forest].routes(
+    cave: events[:cave].routes(
+      {
+        deeper: events[:monster],
+      }
+    ),
+    further_in_forest: events[:tree],
+  )
+end
+```
 
 ### Advanced options
-TODO: Write usage instructions here
+Use combination of counters and custom routes (routes_by_lambda
+instead of routes method) to create complex scenario
+
+``` ruby
+test_scenario = Scenario.new(
+  events: {
+    choise: Event("choise.txt"),
+    happy_end: Event("happy_end.txt"),
+    you_died: Event("you_died.txt"),
+  },
+  counters: {
+    karma: Counter(1),
+  },
+) do |events|
+  events[choise].routes_by_lambda(
+    lambda do |option|
+      case option
+      when :good
+        counters[:karma].value += 1
+      when :bad
+        counters[:karma].value -= 1
+      end
+
+      return events[:you_died] unless counters[:karma].value.positive?
+
+      return events[:happy_end]
+    end
+  )
+end
+```
 
 ## Development
 

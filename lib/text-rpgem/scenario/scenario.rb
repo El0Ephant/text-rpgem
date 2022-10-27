@@ -5,12 +5,14 @@ require_relative "counter"
 
 class Scenario
   # @param [Hash<Counter>] counters
+  # @param [Hash<Counter>] hidden_counters
   # @param [Hash<Event>] events
-  def initialize(events:, counters: {})
+  def initialize(events:, counters: {}, hidden_counters: {})
     @events = events
     @current = events.first[1]
     @counters = counters
-    yield events, counters
+    @hidden_counters = hidden_counters
+    yield events, counters, hidden_counters
   end
 
   attr_reader :current
@@ -19,9 +21,5 @@ class Scenario
   def next(option)
     @current = @current.route_lambda.call(option)
   end
-
-  def not_print
-    puts @current.description
-    puts @current.options.each { |opt| puts opt[1] }
-  end
 end
+
