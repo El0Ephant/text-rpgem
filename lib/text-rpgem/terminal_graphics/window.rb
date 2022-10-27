@@ -4,6 +4,7 @@ require "io/console"
 require_relative "escape_chars"
 require_relative "../scenario/scenario"
 require_relative "../scenario/counter"
+require_relative "scroller"
 
 # Class that represents Windows terminal interface for text rpg
 class Window
@@ -37,6 +38,7 @@ class Window
 
   def initialize_event
     create_text_buffer(@scenario.current.description)
+    @scroller = Scroller.new @text.size
     @cur_upper_line = 0
     @is_panel_visible = false
     @routes = []
@@ -45,16 +47,17 @@ class Window
     end
     move_text_line(0)
     add_block(Array.new(23, Array.new(64, " ")), 1, 1)
+    move_line(0)
   end
 
   def run
     add_block(line_to_arr("Press E to start"), 2, 1)
-
     loop do
       update_bars
       update_counters
+      add_block(@scroller.result_arr, 66, 1)
       # add_block(line_to_arr("█\n█\n█\n█\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n "), 66, 1)
-      move_line(0)
+      #
       render
       case key_get
       when "tab"
@@ -168,6 +171,8 @@ class Window
   def move_text_line(direction)
     return if (@cur_upper_line + direction).negative?
 
+    #system "pause"
+    @scroller.move direction
     @cur_upper_line += direction
     add_block(@text[@cur_upper_line, 23], 2, 1)
   end
