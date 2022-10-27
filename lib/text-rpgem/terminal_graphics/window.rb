@@ -25,9 +25,15 @@ class Window
         @counters[k] = v
       end
     end
+    validate_counters_number
     @is_panel_visible = false
     @cur_upper_line = 0
     EscapeChars.hide_cursor
+  end
+
+  def validate_counters_number
+    raise RuntimeError.new("Too much bars for terminal interface") if @bars.count > 5
+    raise RuntimeError.new("Too much counters for terminal interface") if @counters.count > 6
   end
 
   def run
