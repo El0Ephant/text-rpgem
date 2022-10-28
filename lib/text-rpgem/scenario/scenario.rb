@@ -16,6 +16,7 @@ class Scenario
   end
 
   attr_reader :current
+  attr_reader :counters
 
   # @param [Symbol] option
   def next(option)

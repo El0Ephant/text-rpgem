@@ -9,7 +9,7 @@ class Counter
 end
 
 class Bar < Counter
-  def initialize(value, max, min)
+  def initialize(value, max, min: 0)
     @max = max
     @min = min
     super(value)
