@@ -1,0 +1,8 @@
+{
+great description
+}
+
+[option1::go left]
+text
+[option2::go straight]
+[option3::go right]
