@@ -5,9 +5,7 @@ class Counter
   def initialize(value)
     @value = value
   end
-
   attr_accessor :value
-
 end
 
 class Bar < Counter
@@ -18,5 +16,9 @@ class Bar < Counter
   end
 
   attr_reader :max, :min
-  
+
+  def value=(new_val)
+    super(new_val) if min < new_val && new_val < max
+  end
+
 end
