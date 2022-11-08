@@ -22,9 +22,10 @@ If bundler is not being used to manage dependencies, install the gem by executin
 ## Usage
 
 ### Text markup
-You story consists of events. Markup your text file
+You story consists of events. Markup your text files
 like this
 
+```
 {
 
 Description of event
@@ -36,7 +37,7 @@ Description of event
 [option_name2::option description]
 
 [option_name3::option description]
-
+```
 In your application you will refer to your option 
 by option name, player will only see option descriptions
 
@@ -80,7 +81,7 @@ end
 3) Add more routes to create tree structure of
 your story.
 ``` ruby
-my_scenario = Scenario.new(_) do |events|
+my_scenario = Scenario.new(events) do |events|
   events[:beginning].routes(
     {
       left: events[:river].routes(
@@ -101,7 +102,7 @@ end
 You can rearrange your tree if you feel bad about
 depth
 ``` ruby
-my_scenario = Scenario.new(_) do |events|
+my_scenario = Scenario.new(events) do |events|
   events[:beginning].routes(
     {
       left: events[:river].routes(

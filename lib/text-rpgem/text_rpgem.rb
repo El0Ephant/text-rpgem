@@ -4,5 +4,10 @@ require_relative "version"
 
 module TextRpgem
   class Error < StandardError; end
-    # Your code goes here...
+
+  require_relative 'parser/parser'
+  require_relative 'parser/parser_errors'
+  require_relative 'scenario/scenario'
+  require_relative 'scenario/event'
+  require_relative 'terminal_graphics/terminal_graphics'
 end
