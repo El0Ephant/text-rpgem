@@ -6,7 +6,7 @@ class Scroller
 
   def initialize(length)
     @length = length
-    @position = 0
+    @position = 23
     @result_arr = Array.new(23) { [" "] }
     @scroller_length = [(23.0 / (length + 1) * 23).ceil, 23].min
     @scroller_length&.times do |i|
@@ -24,5 +24,4 @@ class Scroller
     end
     @position += direction
   end
-
 end
