@@ -130,6 +130,7 @@ class Window
 
   def show_help_panel
     return_size
+    @is_panel_visible = false
     @is_help_visible = true
     add_block(line_to_arr("┏#{"━" * 98}┓\n#{"┃#{" " * 98}┃\n" * 23}┗#{"━" * 98}┛\n"), 0, 0)
     add_block(line_to_arr(
