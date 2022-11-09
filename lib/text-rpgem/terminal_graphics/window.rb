@@ -357,7 +357,7 @@ def bar_to_s(name, bar)
     end
   end
   name = "#{name[0, 7]}..." if name.length > 10
-  format("%10s", name) + up + format("\n%10d", bar.value) + down
+  format("%10s", name) + up + format("%10d", bar.value) + down
 end
 
 def counter_to_s(name, counter)
