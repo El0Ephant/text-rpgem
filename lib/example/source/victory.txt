@@ -1,0 +1,27 @@
+{
+Наконец, рубиновый дракон повержен. 
+Принёс ли вам этот факт хоть немного
+удовлетворения?
+Нет, серьёзно, я стараюсь, пишу плохие
+концовки, а вы их, быть может, даже не увидите.
+А потом они жалуются на рельсовость сюжета -
+а как же вы хотели, если всё вот так просто,
+и столько веток остаются нетронутыми,
+висят мёртвым грузом.
+Хорошо хоть это тестовый сценарий, и 
+развилок тут не так уж много. А если бы 
+их было в достатке, вы бы посмотрели их все?
+
+Вот и я думаю, что нет. 
+
+Знаете что, это плохая концовка. Дракон 
+не повержен и всех съел. Вообще всех.
+Не знаю как так вышло, но факт остаётся
+фактом. 
+
+Нажмите q и почитайте про алгоритмы обхода графов.
+(Именно графов, а не деревьев, тут ведь как-никак
+имеются циклы)
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+}

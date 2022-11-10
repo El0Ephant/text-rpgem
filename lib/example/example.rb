@@ -20,7 +20,7 @@ example_scenario = Scenario.new(
     shop_without_sword: Event.new("#{path}shop_without_sword.txt"),
     crossroad: Event.new("#{path}crossroad.txt"),
     question: Event.new("#{path}question.txt"),
-    retreat: Event.new("#{path}crossroad.txt"),
+    retreat: Event.new("#{path}retreat.txt"),
     dragon: Event.new("#{path}dragon.txt"),
     fight: Event.new("#{path}fight.txt"),
     death: Event.new("#{path}death.txt"),
@@ -80,8 +80,40 @@ example_scenario = Scenario.new(
   # fight section
   events[:out].routes(
     {
-      start: Events()
+      start: events[:crossroad].routes_by_lambda(
+        lambda do |option|
+          case option
+          when :modern
+            return events[:dragon]
+          when :old
+            counters[:hp].value -= 2
+            return events[:question].routes(
+              {
+                leave: events[:retreat],
+                fight: events[:dragon],
+              }
+            )
+          end
+        end
+      )
     }
+  )
+  events[:dragon].routes(
+    {
+      fight: events[:fight],
+    }
+  )
+
+  events[:fight].routes_by_lambda(
+    lambda do |option|
+      case option
+      when :victory
+        return events[:victory]
+      when :death
+        counters[:hp].value -= 1000
+        return events[:death]
+      end
+    end
   )
 end
 
