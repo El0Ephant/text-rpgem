@@ -129,6 +129,8 @@ class Window
   end
 
   def show_help_panel
+    return_size
+    @is_panel_visible = false
     @is_help_visible = true
     add_block(line_to_arr("┏#{"━" * 98}┓\n#{"┃#{" " * 98}┃\n" * 23}┗#{"━" * 98}┛\n"), 0, 0)
     add_block(line_to_arr(
@@ -141,6 +143,7 @@ class Window
   end
 
   def hide_help_panel
+    return_size
     @is_help_visible = false
     add_block(line_to_arr(
                 "┏#{"━" * 64}┳━┳#{"━" * 31}┓\n"\
@@ -332,24 +335,25 @@ class Window
 end
 
 def bar_to_s(name, bar)
-  light = 20 - bar.value * 20 / bar.max
+  heavy = bar.value * 20 / bar.max
   up =
-    "┏━━━━━━━━━━━━━━━━━━━┓\n"
+    "┌───────────────────┐\n"
   down =
-    "┗━━━━━━━━━━━━━━━━━━━┛"
-  if light.positive?
-    up[0] = "┌"
-    down[0] = "└"
-    (light - 1).times do |i|
-      up[i + 1] = "─"
-      down[i + 1] = "─"
+    "└───────────────────┘"
+  if heavy.positive? || bar.value != bar.min
+    heavy = [heavy, 1].max
+    up[0] = "┏"
+    down[0] = "┗"
+    (heavy - 1).times do |i|
+      up[i + 1] = "━"
+      down[i + 1] = "━"
     end
-    if light == 20
-      up[light] = "┐"
-      down[light] = "┘"
+    if heavy == 20
+      up[heavy] = "┓"
+      down[heavy] = "┛"
     else
-      up[light] = "┲"
-      down[light] = "┺"
+      up[heavy] = "┱"
+      down[heavy] = "┹"
     end
   end
   name = "#{name[0, 7]}..." if name.length > 10
@@ -360,4 +364,3 @@ def counter_to_s(name, counter)
   name = "#{name[0, 12]}..." if name.length > 15
   format("%<name>15s\n%<value>15d", name: name, value: counter.value)
 end
-
