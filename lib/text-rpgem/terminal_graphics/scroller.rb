@@ -6,7 +6,7 @@ class Scroller
 
   def initialize(length)
     @length = length
-    @position = 23
+    @position = 0
     @result_arr = Array.new(23) { [" "] }
     @scroller_length = [(23.0 / (length + 1) * 23).ceil, 23].min
     @scroller_length&.times do |i|
@@ -15,7 +15,9 @@ class Scroller
   end
 
   def move(direction)
-    if (@position * 23 / @length) != ((@position + direction) * 23 / @length)
+    if @position == @length - 23 ||  @position + direction == @length
+      @result_arr.rotate!(-1) if direction.positive?
+    elsif (@position * 23 / @length) != ((@position + direction) * 23 / @length)
       if direction.negative?
         @result_arr.rotate! 1
       else
