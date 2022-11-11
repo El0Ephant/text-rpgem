@@ -9,7 +9,7 @@ require_relative "scroller"
 # A class that represents the Windows terminal interface for text-based role-playing games
 class Window
   # @param [Scenario] scenario
-  def initialize(scenario, print_speed: 0.001)
+  def initialize(scenario, print_speed: 0.001, show_help_at_start: true)
     return_size
     EscapeChars.hide_cursor
     @print_speed = print_speed
@@ -34,6 +34,7 @@ class Window
     initialize_event
     validate_elements_number
     @print_thread = nil
+    @show_help_at_start = show_help_at_start
   end
 
   def validate_elements_number
@@ -56,7 +57,7 @@ class Window
   end
 
   def run
-    show_help_panel
+    show_help_panel if @show_help_at_start
     loop do
       if @is_help_visible
         case key_get
@@ -130,6 +131,8 @@ class Window
 
   def show_help_panel
     return_size
+    @print_thread&.kill
+    move_line(0)
     @is_panel_visible = false
     @is_help_visible = true
     add_block(line_to_arr("┏#{"━" * 98}┓\n#{"┃#{" " * 98}┃\n" * 23}┗#{"━" * 98}┛\n"), 0, 0)
